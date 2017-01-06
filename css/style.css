@@ -33,6 +33,7 @@
     table.tableSection thead, table.tableSection tbody {
         float: left;
         width: 100%;
+
     }
     table.tableSection thead, table.tableSection tr {
       background-color: #303030;
@@ -46,6 +47,7 @@
     table.tableSection tbody {
         overflow: auto;
         height: 300px;
+        background-color: #2d2e33;
     }
     table.tableSection tr {
         width: 100%;
@@ -66,4 +68,8 @@
  .section .manage button{
         padding: 7px;
         margin: 7px;
+ }
+ .tableSection a {
+     color: white;
+     text-decoration: none;
  }

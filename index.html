@@ -16,12 +16,18 @@
   <table class="tableSection">
     <thead>
         <tr>
-            <th>Symbol</th>
+            <th>
+              <a href="#" ng-click="sortType = 'Symbol'; sortReverse = !sortReverse">
+                Symbol
+                <span ng-show="sortType == 'Symbol' && !sortReverse" class="fa fa-caret-down"></span>
+                <span ng-show="sortType == 'Symbol' && sortReverse" class="fa fa-caret-up"></span>
+              </a>
+            </th>
             <th>Price</th>
         </tr>
     </thead>
     <tbody>
-        <tr ng-repeat="quote in ctrl.quotes">
+        <tr ng-repeat="quote in ctrl.quotes | orderBy:sortType:sortReverse">
           <td>{{quote.Symbol}}</td>
           <td ng-style="{color: quote.change}">
             {{quote.Price | number:5}}
