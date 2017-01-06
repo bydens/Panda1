@@ -1,4 +1,3 @@
-// function mainCtrl($scope, mySocket, socketIo) {
 function mainCtrl($scope, socketIo) {
 
   let inition = false;
@@ -27,12 +26,13 @@ function mainCtrl($scope, socketIo) {
    });
 
   function connect() {
-    if (!inition){
+    if (!inition) {
       socketIo.init();
       inition = true;
     }
-    else
+    else {
       socketIo.connect();
+    }
     $scope.socketConnect = true;
     getData();
   }
@@ -50,30 +50,8 @@ function mainCtrl($scope, socketIo) {
   }
 }
 
-//----------------------------------------
-function mySocket(socketFactory) {
-  var myIoSocket = io.connect('wss://devbinary.pandats-api.com:443', {
-        path: '/socketio1/',
-        transports: ["websocket", "polling"],
-        'reconnection delay': 1000,
-        'reconnection limit': 1000,
-        'max reconnection attempts': 'Infinity'
-    });
-
-  mySocket = socketFactory({
-    ioSocket: myIoSocket
-  });
-
-  return mySocket;
-}
-
 //-------------------------------------------------
 function socketIo($rootScope, $window) {
-  // let socket1 = io('wss://devbinary.pandats-api.com:443', {
-  //       path: '/socketio1/',
-  //       transports: ["websocket", "polling"],
-  //       'max reconnection attempts': 'Infinity'
-  //   });
     let disconnecting = false;
     return {
       init() {
@@ -115,64 +93,6 @@ function socketIo($rootScope, $window) {
 }
 socketIo.$inject = ['$rootScope', '$window'];
 
-//-----------------------------------------------------
-  socketFactory.$inject = ['$rootScope', '$window'];
-
-  function socketFactory($rootScope, $window) {
-
-    var socket;
-    var services = {
-      on: on,
-      emit: emit,
-      init: init
-    };
-
-    return services;
-
-    function init() {
-      $window.socket = io('wss://devbinary.pandats-api.com:443', {
-        path: '/socketio1/',
-        transports: ["websocket", "polling"],
-        'max reconnection attempts': 'Infinity'
-      });
-    }
-
-    function on(eventName, callback) {
-      $window.socket.on(eventName, function() {
-        var args = arguments;
-        $rootScope.$apply(function() {
-          callback.apply($window.socket, args);
-        });
-      });
-    }
-
-    function emit(eventName, data, callback) {
-      $window.socket.emit(eventName, data, function() {
-        var args = arguments;
-        $rootScope.$apply(function() {
-          if (callback) {
-            callback.apply($window.socket, args);
-          }
-        });
-      });
-    }
-  }
-
-//---------------------------------------------------------
-function connectSer(socketIo) {
-  return {
-    init() {
-      return socketIo;
-    }
-  }
-}
-connectSer.$inject = ['socketIo'];
-
-
-// angular.module('myApp', ['btford.socket-io'])
 angular.module('myApp', [])
   .controller('mainCtrl', mainCtrl)
-  .factory('socketIo', socketIo)
-  .factory('connectSer', connectSer)
-  .factory('socketFactory', socketFactory)
-  .factory('mySocket', mySocket);
+  .factory('socketIo', socketIo);
