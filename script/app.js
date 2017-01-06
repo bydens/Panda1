@@ -1,10 +1,9 @@
-mainCtrl.$inject = ['$scope', 'socketIo', 'myConfig'];
+mainCtrl.$inject = ['$scope', 'socketIo', 'myConfig', '$log'];
 
-function mainCtrl($scope, socketIo, myConfig) {
-  let vm = this;
+function mainCtrl($scope, socketIo, myConfig, $log) {
   const urlPath = myConfig.url + ':' + myConfig.port;
   const option = myConfig.options;
-  // vm.socketConnect = socketIo.inition;
+  let vm = this;
   vm.connect = connect;
   vm.disConnect = disConnect;
   vm.quotes = [];
@@ -13,7 +12,7 @@ function mainCtrl($scope, socketIo, myConfig) {
     angular.bind(vm, () => vm.socketConnect), 
     (newVal) => {
       if (newVal) {
-        socketIo.on('disconnect', () => console.log('disconnected'));
+        socketIo.on('disconnect', () => $log.log('disconnected'));
         socketIo.on('connect', () => getData());
         socketIo.on('GetQuotes', (data) => GetQuotes(data));
         socketIo.on('subscribe', (update) => subscribe(update));
@@ -33,11 +32,11 @@ function mainCtrl($scope, socketIo, myConfig) {
     }
   }
 
-  function GetQuotes(data) {
+  function GetQuotes(data) { //error handling
     vm.quotes = JSON.parse(data).quotesSnapshot;
   }
  
-  function subscribe(update) {
+  function subscribe(update) { //error handling
     update.forEach((items) => {
       let pos = vm.quotes.map((quote) => quote.Symbol).indexOf(items[1]);
       if (pos !== -1) {
@@ -50,17 +49,16 @@ function mainCtrl($scope, socketIo, myConfig) {
   function getData() {
     socketIo.emit('GetQuotes', {reqID: parseInt(Math.random() * 9999)});
     socketIo.emit('QuotesSubscribe', {reqID: parseInt(Math.random() * 9999)}); 
-    console.log('connected');
+    $log.log('connected');
   }
 
   function errorHand(data) {
-    console.log('error: ', data);
-    vm.err = data;
+    $log.log('error: ', data);
+    // vm.err = data;
     socketIo.disconnect();
   }
 }
 
-//-------------------------------------------------
 socketIo.$inject = ['$rootScope'];
 function socketIo($rootScope) {
     let disconnecting = false;
@@ -102,6 +100,12 @@ function socketIo($rootScope) {
     };
 }
 
+function myRound() {
+  return function(item) {
+    return Math.floor(item * 100000) / 100000;
+  }
+}
+
 angular.module('myApp', [])
   .constant('myConfig', {
           url: 'wss://devbinary.pandats-api.com',
@@ -112,4 +116,5 @@ angular.module('myApp', [])
           }
       })
   .controller('mainCtrl', mainCtrl)
+  .filter('myRound', myRound)
   .factory('socketIo', socketIo);
