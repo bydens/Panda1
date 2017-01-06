@@ -10,13 +10,26 @@ function mainCtrl($scope, socketIo) {
     angular.bind(vm, () => vm.socketConnect), 
     (newVal) => {
       if (newVal) {
-        socketIo.on('connect', () => console.log('connected'));
         socketIo.on('disconnect', () => console.log('disconnected'));
+        socketIo.on('connect', () => getData());
         socketIo.on('GetQuotes', (data) => GetQuotes(data));
         socketIo.on('subscribe', (update) => subscribe(update));
+        socketIo.on('connect_error', (data) => errorHand(data));
      }
    });
 
+  function connect() {
+    !socketIo.inition ? socketIo.init() : socketIo.connect();
+    vm.socketConnect = socketIo.inition;
+  }
+
+  function disConnect() {
+    if (vm.socketConnect) {
+      socketIo.disconnect();
+      vm.quotes = [];
+    }
+  }
+  
   function GetQuotes(data) {
     vm.quotes = JSON.parse(data).quotesSnapshot;
   }
@@ -31,68 +44,65 @@ function mainCtrl($scope, socketIo) {
     });
   }
 
-  function connect() {
-    !socketIo.inition ? socketIo.init() : socketIo.connect();
-    vm.socketConnect = socketIo.inition;
-    getData();
-  }
-
-  function disConnect() {
-    if (vm.socketConnect) {
-      socketIo.disconnect();
-      vm.quotes = [];
-    }
-  }
-
   function getData() {
     socketIo.emit('GetQuotes', {reqID: parseInt(Math.random() * 9999)});
     socketIo.emit('QuotesSubscribe', {reqID: parseInt(Math.random() * 9999)}); 
+    console.log('connected');
   }
+
+  function errorHand(data) {
+    console.log('error: ', data);
+    vm.err = data;
+    socketIo.disconnect();
+  }
+
+
 }
 
 //-------------------------------------------------
-function socketIo($rootScope, $window) {
+function socketIo($rootScope) {
     let disconnecting = false;
     return {
       inition: false,
+      socket: {},
       init() {
-        $window.socket =  io('wss://devbinary.pandats-api.com:443', {
+        this.socket = io('wss://devbinary.pandats-api.com111:443', {
             path: '/socketio1/',
             transports: ["websocket", "polling"]
         });
         this.inition = true;
       },
       on(eventName, callback) {
-        $window.socket.on(eventName, function() {
+        this.socket.on(eventName, function() {
           let args = arguments;
           if (!disconnecting) {
-            $rootScope.$apply(() => callback.apply($window.socket, args));
+            $rootScope.$apply(() => callback.apply(this.socket, args));
           } else {
-            callback.apply($window.socket, args);
+            callback.apply(this.socket, args);
           }
         });
       },
       emit(eventName, data, callback) {
-        $window.socket.emit(eventName, data, function() {
+        this.socket.emit(eventName, data, function() {
           let args = arguments;
           $rootScope.$apply(() => {
             if (callback) {
-              callback.apply($window.socket, args);
+              callback.apply(this.socket, args);
             }
           });
         })
       },
       connect() {
         disconnecting = false;
-        $window.socket.connect();
+        this.socket.connect();
       },
       disconnect() {
         disconnecting = true;
-        $window.socket.disconnect();
+        this.socket.disconnect();
       }
     };
 }
-socketIo.$inject = ['$rootScope', '$window'];
+socketIo.$inject = ['$rootScope'];
 
 angular.module('myApp', [])
   .controller('mainCtrl', mainCtrl)
