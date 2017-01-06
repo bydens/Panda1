@@ -1,0 +1,69 @@
+  .section {
+    width: 300px;
+    font: 0.7em Arial, sans-serif;
+  }
+  .tableHead {
+      background-color:#2d2e33;
+      background: linear-gradient(to top, #2d2e33, #44464a);
+      color: #9d9d9e;
+      font-size: 1.5em;
+      padding: 15px 20px;
+      border-bottom: 1px solid black;
+      box-shadow: 0 1px 10px rgba(0, 0, 0, 0.5);
+      position: relative;
+      z-index: 5;
+  }
+  
+  table.tableSection thead tr.caption {
+      background-color:#2d2e33;
+      background: linear-gradient(to top, #2d2e33, #44464a);
+      color: #9d9d9e;
+      font-size: 1.5em;
+  }
+  table.tableSection thead tr.caption th{
+      height: 47px;
+      padding-left: 20px;
+  }
+    table.tableSection {
+        display: table;
+        width: 300px;
+        color: white;
+        border-spacing: 0;
+    }
+    table.tableSection thead, table.tableSection tbody {
+        float: left;
+        width: 100%;
+    }
+    table.tableSection thead, table.tableSection tr {
+      background-color: #303030;
+      border-bottom: 1px solid black;
+    }
+
+    table.tableSection tbody tr:nth-child(odd) {
+      background-color: #1f1f1f;
+    }
+    
+    table.tableSection tbody {
+        overflow: auto;
+        height: 300px;
+    }
+    table.tableSection tr {
+        width: 100%;
+        display: table;
+        text-align: left;
+        min-height: 32px;
+    }
+    table.tableSection th, table.tableSection td {
+        min-width: 70px;
+        padding: 10px 30px;
+        font-weight: normal;
+    }
+.section .manage{
+        text-align: center;
+        padding: 5px;
+        background-color: #303030
+    }
+ .section .manage button{
+        padding: 7px;
+        margin: 7px;
+ }
