@@ -1,6 +1,9 @@
-function mainCtrl($scope, socketIo) {
+mainCtrl.$inject = ['$scope', 'socketIo', 'myConfig'];
 
+function mainCtrl($scope, socketIo, myConfig) {
   let vm = this;
+  const urlPath = myConfig.url + ':' + myConfig.port;
+  const option = myConfig.options;
   // vm.socketConnect = socketIo.inition;
   vm.connect = connect;
   vm.disConnect = disConnect;
@@ -19,7 +22,7 @@ function mainCtrl($scope, socketIo) {
    });
 
   function connect() {
-    !socketIo.inition ? socketIo.init() : socketIo.connect();
+    !socketIo.inition ? socketIo.init(urlPath, option) : socketIo.connect();
     vm.socketConnect = socketIo.inition;
   }
 
@@ -29,7 +32,7 @@ function mainCtrl($scope, socketIo) {
       vm.quotes = [];
     }
   }
-  
+
   function GetQuotes(data) {
     vm.quotes = JSON.parse(data).quotesSnapshot;
   }
@@ -55,21 +58,17 @@ function mainCtrl($scope, socketIo) {
     vm.err = data;
     socketIo.disconnect();
   }
-
-
 }
 
 //-------------------------------------------------
+socketIo.$inject = ['$rootScope'];
 function socketIo($rootScope) {
     let disconnecting = false;
     return {
       inition: false,
       socket: {},
-      init() {
-        this.socket = io('wss://devbinary.pandats-api.com111:443', {
-            path: '/socketio1/',
-            transports: ["websocket", "polling"]
-        });
+      init(url, options) {
+        this.socket = io(url, options);
         this.inition = true;
       },
       on(eventName, callback) {
@@ -102,8 +101,15 @@ function socketIo($rootScope) {
       }
     };
 }
-socketIo.$inject = ['$rootScope'];
 
 angular.module('myApp', [])
+  .constant('myConfig', {
+          url: 'wss://devbinary.pandats-api.com',
+          port: '443',
+          options: {
+            path: '/socketio1/',
+            transports: ["websocket", "polling"]
+          }
+      })
   .controller('mainCtrl', mainCtrl)
   .factory('socketIo', socketIo);
