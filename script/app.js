@@ -1,46 +1,46 @@
 function mainCtrl($scope, socketIo) {
 
-  let inition = false;
-  $scope.socketConnect = false;
-  $scope.connect = connect;
-  $scope.disConnect = disConnect;
-  $scope.quotes = [];
+  let vm = this;
+  // vm.socketConnect = socketIo.inition;
+  vm.connect = connect;
+  vm.disConnect = disConnect;
+  vm.quotes = [];
 
-   $scope.$watch('socketConnect', (newVal) => {
-     if (newVal) {
-      socketIo.on('connect', () => console.log('connected'));
-      socketIo.on('disconnect', () => console.log('disconnected'));
-      socketIo.on('GetQuotes', (data) => {
-          $scope.quotes = JSON.parse(data).quotesSnapshot;
-      });
-      socketIo.on('subscribe', (update) => {
-          update.forEach((items) => {
-            let pos = $scope.quotes.map((quote) => quote.Symbol).indexOf(items[1]);
-            if (pos !== -1) {
-              $scope.quotes[pos].change = $scope.quotes[pos].Price < items[0] ? 'green' : 'red';
-              $scope.quotes[pos].Price = items[0]
-            }
-        });
-      });
+  $scope.$watch(
+    angular.bind(vm, () => vm.socketConnect), 
+    (newVal) => {
+      if (newVal) {
+        socketIo.on('connect', () => console.log('connected'));
+        socketIo.on('disconnect', () => console.log('disconnected'));
+        socketIo.on('GetQuotes', (data) => GetQuotes(data));
+        socketIo.on('subscribe', (update) => subscribe(update));
      }
    });
 
+  function GetQuotes(data) {
+    vm.quotes = JSON.parse(data).quotesSnapshot;
+  }
+ 
+  function subscribe(update) {
+    update.forEach((items) => {
+      let pos = vm.quotes.map((quote) => quote.Symbol).indexOf(items[1]);
+      if (pos !== -1) {
+        vm.quotes[pos].change = vm.quotes[pos].Price < items[0] ? 'green' : 'red';
+        vm.quotes[pos].Price = items[0]
+      }
+    });
+  }
+
   function connect() {
-    if (!inition) {
-      socketIo.init();
-      inition = true;
-    }
-    else {
-      socketIo.connect();
-    }
-    $scope.socketConnect = true;
+    !socketIo.inition ? socketIo.init() : socketIo.connect();
+    vm.socketConnect = socketIo.inition;
     getData();
   }
 
   function disConnect() {
-    if ($scope.socketConnect) {
+    if (vm.socketConnect) {
       socketIo.disconnect();
-      $scope.quotes = [];
+      vm.quotes = [];
     }
   }
 
@@ -54,12 +54,13 @@ function mainCtrl($scope, socketIo) {
 function socketIo($rootScope, $window) {
     let disconnecting = false;
     return {
+      inition: false,
       init() {
         $window.socket =  io('wss://devbinary.pandats-api.com:443', {
             path: '/socketio1/',
-            transports: ["websocket", "polling"],
-            'max reconnection attempts': 'Infinity'
+            transports: ["websocket", "polling"]
         });
+        this.inition = true;
       },
       on(eventName, callback) {
         $window.socket.on(eventName, function() {

@@ -9,7 +9,7 @@
   <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.7/angular.min.js"></script>
 </head>
 <body>
-  <div class="section" ng-controller="mainCtrl">
+  <div class="section" ng-controller="mainCtrl as ctrl">
     <div class="tableHead">
       Live Feed
     </div>
@@ -21,7 +21,7 @@
         </tr>
     </thead>
     <tbody>
-        <tr ng-repeat="quote in quotes">
+        <tr ng-repeat="quote in ctrl.quotes">
           <td>{{quote.Symbol}}</td>
           <td ng-style="{color: quote.change}">
             {{quote.Price | number:5}}
@@ -32,8 +32,8 @@
     </tbody>
 </table>
 <div class="manage">
-  <button ng-click="disConnect()">Disconnect</button>
-  <button ng-click="connect()">Connect</button>
+  <button ng-click="ctrl.disConnect()">Disconnect</button>
+  <button ng-click="ctrl.connect()">Connect</button>
 </div>
 </div>
 
