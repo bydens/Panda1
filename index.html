@@ -28,11 +28,11 @@
               <th>Price</th>
             </tr>
           </thead>
-          <tbody id="style-4">
+          <tbody id="style-scroll">
             <tr ng-repeat="quote in ctrl.quotes | orderBy:sortType:sortReverse">
               <td>{{quote.Symbol}}</td>
               <td ng-style="{color: quote.change}">
-                {{quote.Price | number:5}}
+                {{quote.Price | myRound}}
                 <i ng-if="quote.change == 'green'" class="fa fa-arrow-up" aria-hidden="true"></i>
                 <i ng-if="quote.change == 'red'" class="fa fa-arrow-down" aria-hidden="true"></i>
               </td>
@@ -48,5 +48,9 @@
   </div>
 
   <script src="script/app.js"></script>
+  <script src="script/constants.js"></script>
+  <script src="script/controllers.js"></script>
+  <script src="script/services.js"></script>
+  <script src="script/filters.js"></script>
 </body>
 </html>
