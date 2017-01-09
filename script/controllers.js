@@ -10,10 +10,10 @@
     let vm = this;
     const urlPath = myConfig.url + ':' + myConfig.port;
     const option = myConfig.options;
-    // vm.socketConnect = socketIo.inition;
+
+    vm.quotes = [];
     vm.connect = connect;
     vm.disConnect = disConnect;
-    vm.quotes = [];
 
     $scope.$watch(
       angular.bind(vm, () => vm.socketConnect), 
