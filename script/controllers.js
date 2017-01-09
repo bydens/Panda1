@@ -40,17 +40,19 @@
     }
 
     function GetQuotes(data) {
-      vm.quotes = JSON.parse(data).quotesSnapshot;
+      data ? vm.quotes = JSON.parse(data).quotesSnapshot : $log.error('Error getting data!');
     }
   
     function subscribe(update) {
-      update.forEach((items) => {
-        let pos = vm.quotes.map((quote) => quote.Symbol).indexOf(items[1]);
-        if (pos !== -1) {
-          vm.quotes[pos].change = vm.quotes[pos].Price < items[0] ? 'green' : 'red';
-          vm.quotes[pos].Price = items[0]
-        }
-      });
+      update ? update.forEach((items) => dataHandl(items)) : $log.error('Error updating data!');
+    }
+
+    function dataHandl(data) {
+      let pos = vm.quotes.map((quote) => quote.Symbol).indexOf(data[1]);
+      if (pos !== -1) {
+        vm.quotes[pos].change = vm.quotes[pos].Price < data[0] ? 'green' : 'red';
+        vm.quotes[pos].Price = data[0]
+      }
     }
 
     function getData() {
